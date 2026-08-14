@@ -1,0 +1,139 @@
+{
+    "id": "RawBuildAnswerKey",
+    "presentation": {
+        "title": {
+            "type": "title",
+            "label": "Team Member Card"
+        },
+        "preferredLabelPosition": "aside",
+        "body": {
+            "type": "section",
+            "children": [
+                {
+                    "type": "fieldSet",
+                    "id": "profileSection",
+                    "title": "Profile",
+                    "children": [
+                        {
+                            "type": "section",
+                            "id": "profileRow1",
+                            "horizontal": true,
+                            "columnWidthRatios": [0.5, 0.5],
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "id": "nameValue",
+                                    "label": "Name",
+                                    "labelPosition": "aside",
+                                    "enabled": false,
+                                    "value": "Priya Fernandez"
+                                },
+                                {
+                                    "type": "text",
+                                    "id": "roleValue",
+                                    "label": "Role",
+                                    "labelPosition": "aside",
+                                    "enabled": false,
+                                    "value": "Senior Developer"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "id": "profileRow2",
+                            "horizontal": true,
+                            "columnWidthRatios": [0.5, 0.5],
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "id": "emailValue",
+                                    "label": "Email",
+                                    "labelPosition": "aside",
+                                    "enabled": false,
+                                    "value": "priya.fernandez@digicel.com"
+                                },
+                                {
+                                    "type": "text",
+                                    "id": "startDateValue",
+                                    "label": "Start Date",
+                                    "labelPosition": "aside",
+                                    "enabled": false,
+                                    "value": "03/15/2022"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "fieldSet",
+                    "id": "skillsSection",
+                    "title": "Skills",
+                    "children": [
+                        {
+                            "type": "checkBox",
+                            "id": "skillPmdScripting",
+                            "label": "PMD Scripting",
+                            "value": true
+                        },
+                        {
+                            "type": "checkBox",
+                            "id": "skillRestEndpoints",
+                            "label": "REST Endpoints",
+                            "value": true
+                        },
+                        {
+                            "type": "checkBox",
+                            "id": "skillBusinessObjects",
+                            "label": "Business Objects",
+                            "value": false
+                        },
+                        {
+                            "type": "checkBox",
+                            "id": "skillHubNavigation",
+                            "label": "Hub Navigation",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "type": "fieldSet",
+                    "id": "recentTasksSection",
+                    "title": "Recent Tasks",
+                    "children": [
+                        {
+                            "type": "grid",
+                            "id": "recentTasksGrid",
+                            "label": "Recent Tasks",
+                            "rows": "<% [0, 1, 2] %>",
+                            "rowVariableName": "row",
+                            "columns": [
+                                {
+                                    "type": "column",
+                                    "columnId": "taskCol",
+                                    "label": "Task",
+                                    "cellTemplate": {
+                                        "type": "text",
+                                        "id": "taskValue",
+                                        "enabled": false,
+                                        "value": "<% row == 0 ? 'Fix login bug' : row == 1 ? 'Build onboarding page' : 'Review PR #42' %>"
+                                    }
+                                },
+                                {
+                                    "type": "column",
+                                    "columnId": "statusCol",
+                                    "label": "Status",
+                                    "cellTemplate": {
+                                        "type": "text",
+                                        "id": "statusValue",
+                                        "enabled": false,
+                                        "value": "<% row == 0 ? 'Done' : row == 1 ? 'In Progress' : 'Pending' %>"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

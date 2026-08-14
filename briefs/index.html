@@ -1,0 +1,489 @@
+<title>THE RAW BUILD — Leaderboard</title>
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  :root {
+    --paper: #f2f4f1;
+    --paper-raised: #ffffff;
+    --ink: #1b2430;
+    --ink-soft: #4a5568;
+    --line: rgba(27,36,48,.14);
+    --line-strong: rgba(27,36,48,.28);
+    --accent: #d98a1f;
+    --accent-ink: #7a4a0e;
+    --teal: #257a70;
+    --teal-soft: #e4f1ef;
+    --good: #2f7d4f;
+    --good-soft: #e4f2e8;
+    --bad: #b23b2e;
+    --bad-soft: #f7e6e3;
+    --shadow: 0 1px 2px rgba(27,36,48,.06), 0 8px 24px rgba(27,36,48,.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171b22;
+      --paper-raised: #1f242e;
+      --ink: #eef1f5;
+      --ink-soft: #a3adba;
+      --line: rgba(238,241,245,.14);
+      --line-strong: rgba(238,241,245,.26);
+      --accent: #f2a93b;
+      --accent-ink: #ffd694;
+      --teal: #59b3a6;
+      --teal-soft: #1b2e2c;
+      --good: #5fbf82;
+      --good-soft: #16261c;
+      --bad: #e07862;
+      --bad-soft: #2c1c19;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #171b22;
+    --paper-raised: #1f242e;
+    --ink: #eef1f5;
+    --ink-soft: #a3adba;
+    --line: rgba(238,241,245,.14);
+    --line-strong: rgba(238,241,245,.26);
+    --accent: #f2a93b;
+    --accent-ink: #ffd694;
+    --teal: #59b3a6;
+    --teal-soft: #1b2e2c;
+    --good: #5fbf82;
+    --good-soft: #16261c;
+    --bad: #e07862;
+    --bad-soft: #2c1c19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .mono {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eyebrow {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  a { color: var(--teal); }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 2rem 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  h1.event-title {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.01em;
+    line-height: .98;
+  }
+
+  .event-date {
+    font-size: .85rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .pitch {
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+
+  .rule-strip {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-top: .25rem;
+  }
+
+  .chip {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: .3rem .6rem;
+    border-radius: 3px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-soft);
+  }
+
+  .chip.teal { color: var(--teal); background: var(--teal-soft); border-color: transparent; }
+
+  /* ---------- Podium ---------- */
+  .podium {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    align-items: end;
+  }
+  @media (max-width: 620px) {
+    .podium { grid-template-columns: 1fr; }
+  }
+
+  .podium-spot {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: .45rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .podium-spot::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+  }
+  .podium-spot.gold::before { background: linear-gradient(90deg, var(--accent), #f4c766); }
+  .podium-spot.silver::before { background: linear-gradient(90deg, var(--ink-soft), var(--line-strong)); }
+  .podium-spot.bronze::before { background: linear-gradient(90deg, var(--teal), var(--teal-soft)); }
+
+  .podium-spot.gold {
+    padding-top: 2rem;
+    transform: translateY(-.6rem);
+    border-color: var(--accent);
+    box-shadow: 0 2px 4px rgba(217,138,31,.18), 0 12px 28px rgba(217,138,31,.16);
+  }
+
+  .medal {
+    font-size: 2.1rem;
+    line-height: 1;
+  }
+  .podium-spot.silver .medal, .podium-spot.bronze .medal { font-size: 1.7rem; }
+
+  .podium-rank {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .podium-spot.gold .podium-rank { color: var(--accent-ink); }
+
+  .podium-name {
+    font-weight: 700;
+    font-size: 1.02rem;
+  }
+
+  .podium-score {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    font-size: 1.9rem;
+    color: var(--ink);
+  }
+  .podium-spot.gold .podium-score { color: var(--accent-ink); }
+
+  .podium-sub {
+    font-size: .72rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Standings card ---------- */
+  .card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.6rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+    letter-spacing: .02em;
+  }
+
+  table.standings {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+
+  table.standings th {
+    text-align: left;
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  table.standings th.num, table.standings td.num {
+    text-align: right;
+  }
+
+  table.standings td {
+    padding: .8rem 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  table.standings tr:last-child td { border-bottom: none; }
+
+  tr.rank-1 { background: linear-gradient(90deg, var(--teal-soft), transparent 70%); }
+
+  td.rank {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-weight: 900;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    width: 2.5rem;
+  }
+
+  tr.rank-1 td.rank { color: var(--accent-ink); }
+  tr.rank-2 td.rank { color: var(--ink); }
+  tr.rank-3 td.rank { color: var(--teal); }
+
+  td.name { font-weight: 700; }
+
+  td.bar-cell { width: 40%; min-width: 140px; }
+
+  .score-bar-track {
+    background: var(--line);
+    border-radius: 999px;
+    height: 10px;
+    width: 100%;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--teal), var(--accent));
+  }
+  tr.rank-1 .score-bar-fill { background: linear-gradient(90deg, var(--accent), #f4c766); }
+
+  td.total {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    font-size: 1.15rem;
+    color: var(--ink);
+  }
+  tr.rank-1 td.total { color: var(--accent-ink); }
+
+  .streak {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .streak.on { color: var(--accent-ink); }
+
+  /* ---------- Notes ---------- */
+  ul.notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+  }
+
+  ul.notes li {
+    display: flex;
+    gap: .6rem;
+    font-size: .88rem;
+    color: var(--ink-soft);
+  }
+
+  ul.notes li::before {
+    content: "—";
+    color: var(--teal);
+    flex-shrink: 0;
+  }
+
+  ul.notes li strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: .82rem;
+    color: var(--ink-soft);
+    padding-top: .5rem;
+    border-top: 1px solid var(--line);
+  }
+</style>
+
+<div class="page">
+
+  <div class="masthead">
+    <div class="masthead-top">
+      <h1 class="event-title">THE RAW BUILD</h1>
+      <div class="event-date mono" id="event-date"></div>
+    </div>
+    <p class="pitch">A no-assistance PMD speed build. One page, one mockup, no AI — closest match to the target, built fastest, wins.</p>
+    <div class="rule-strip">
+      <span class="chip teal">Leaderboard</span>
+      <span class="chip">Workday Extend PMD</span>
+      <span class="chip">1 week played</span>
+    </div>
+  </div>
+
+  <div class="podium">
+    <div class="podium-spot silver">
+      <div class="podium-rank">2nd place</div>
+      <div class="medal">🥈</div>
+      <div class="podium-name">Vignesh Balan</div>
+      <div class="podium-score mono">50</div>
+      <div class="podium-sub">Wk1 · streak 0</div>
+    </div>
+    <div class="podium-spot gold">
+      <div class="podium-rank">1st place</div>
+      <div class="medal">🥇</div>
+      <div class="podium-name">Abinaya Sivakumar</div>
+      <div class="podium-score mono">70</div>
+      <div class="podium-sub">Wk1 · streak 0</div>
+    </div>
+    <div class="podium-spot bronze">
+      <div class="podium-rank">3rd place</div>
+      <div class="medal">🥉</div>
+      <div class="podium-name">Lavanya Suji</div>
+      <div class="podium-score mono">30</div>
+      <div class="podium-sub">Wk1 · streak 0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Full standings</h2>
+    <table class="standings">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Progress</th>
+          <th class="num">Wk1</th>
+          <th class="num">Total</th>
+          <th class="num">Streak</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="rank-1">
+          <td class="rank">1</td>
+          <td class="name">Abinaya Sivakumar</td>
+          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:70%"></div></div></td>
+          <td class="wk num mono">70</td>
+          <td class="total num">70</td>
+          <td class="num"><span class="streak">0</span></td>
+        </tr>
+        <tr class="rank-2">
+          <td class="rank">2</td>
+          <td class="name">Vignesh Balan</td>
+          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:50%"></div></div></td>
+          <td class="wk num mono">50</td>
+          <td class="total num">50</td>
+          <td class="num"><span class="streak">0</span></td>
+        </tr>
+        <tr class="rank-3">
+          <td class="rank">3</td>
+          <td class="name">Lavanya Suji</td>
+          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:30%"></div></div></td>
+          <td class="wk num mono">30</td>
+          <td class="total num">30</td>
+          <td class="num"><span class="streak">0</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Weekly rounds</h2>
+    <table class="standings">
+      <thead>
+        <tr>
+          <th>Week</th>
+          <th>Task</th>
+          <th class="num">Winner</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank">1</td>
+          <td class="name">Team Member Card</td>
+          <td class="total num">Abinaya Sivakumar</td>
+          <td class="num"><a href="pages/week-01.html">View round &rarr;</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Notes</h2>
+    <ul class="notes">
+      <li><strong>Wk1</strong> — "Team Member Card": fieldSet + 2-column aside-label fields, checkBox list, static grid. Baseline task, no dropdown/tabs/scripting required.</li>
+      <li><strong>Wk1 scores</strong> — AS 70 (widget 40, layout 20, data 0, grid 0, finished 10); VB 50 (widget 25, layout 15, data 5, grid 0, finished 5); LS 30 (widget 20, layout 10, data 0, grid 0, finished 0).</li>
+      <li>Common miss across all three: nobody got the grid rendering right — worth a walkthrough of grid/rowVariableName binding before next week's task.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <span>Updated after each week's round. Streak = consecutive weeks scoring 80+.</span>
+    <span class="mono">v1</span>
+  </footer>
+
+</div>
+
+<script>
+  document.getElementById('event-date').textContent = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+</script>
