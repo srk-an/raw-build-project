@@ -385,22 +385,22 @@
       <div class="podium-rank">2nd place</div>
       <div class="medal">🥈</div>
       <div class="podium-name">Vignesh Balan</div>
-      <div class="podium-score mono">50</div>
-      <div class="podium-sub">Wk1 · streak 0</div>
+      <div class="podium-score mono">175</div>
+      <div class="podium-sub">Wk1 50 · Wk2 125 · streak 🔥1</div>
     </div>
     <div class="podium-spot gold">
       <div class="podium-rank">1st place</div>
       <div class="medal">🥇</div>
       <div class="podium-name">Abinaya Sivakumar</div>
-      <div class="podium-score mono">70</div>
-      <div class="podium-sub">Wk1 · streak 0</div>
+      <div class="podium-score mono">185</div>
+      <div class="podium-sub">Wk1 70 · Wk2 115 · streak 🔥1</div>
     </div>
     <div class="podium-spot bronze">
       <div class="podium-rank">3rd place</div>
       <div class="medal">🥉</div>
       <div class="podium-name">Lavanya Suji</div>
-      <div class="podium-score mono">30</div>
-      <div class="podium-sub">Wk1 · streak 0</div>
+      <div class="podium-score mono">145</div>
+      <div class="podium-sub">Wk1 30 · Wk2 115 · streak 🔥1</div>
     </div>
   </div>
 
@@ -413,6 +413,7 @@
           <th>Name</th>
           <th>Progress</th>
           <th class="num">Wk1</th>
+          <th class="num">Wk2</th>
           <th class="num">Total</th>
           <th class="num">Streak</th>
         </tr>
@@ -421,26 +422,29 @@
         <tr class="rank-1">
           <td class="rank">1</td>
           <td class="name">Abinaya Sivakumar</td>
-          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:70%"></div></div></td>
+          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:100%"></div></div></td>
           <td class="wk num mono">70</td>
-          <td class="total num">70</td>
-          <td class="num"><span class="streak">0</span></td>
+          <td class="wk num mono">115</td>
+          <td class="total num">185</td>
+          <td class="num"><span class="streak on">🔥1</span></td>
         </tr>
         <tr class="rank-2">
           <td class="rank">2</td>
           <td class="name">Vignesh Balan</td>
-          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:50%"></div></div></td>
+          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:95%"></div></div></td>
           <td class="wk num mono">50</td>
-          <td class="total num">50</td>
-          <td class="num"><span class="streak">0</span></td>
+          <td class="wk num mono">125</td>
+          <td class="total num">175</td>
+          <td class="num"><span class="streak on">🔥1</span></td>
         </tr>
         <tr class="rank-3">
           <td class="rank">3</td>
           <td class="name">Lavanya Suji</td>
-          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:30%"></div></div></td>
+          <td class="bar-cell"><div class="score-bar-track"><div class="score-bar-fill" style="width:78%"></div></div></td>
           <td class="wk num mono">30</td>
-          <td class="total num">30</td>
-          <td class="num"><span class="streak">0</span></td>
+          <td class="wk num mono">115</td>
+          <td class="total num">145</td>
+          <td class="num"><span class="streak on">🔥1</span></td>
         </tr>
       </tbody>
     </table>
@@ -469,8 +473,8 @@
         <tr>
           <td class="rank">2</td>
           <td class="name">Team Directory (live endpoint)</td>
-          <td class="total num mono" style="font-weight:400; color:var(--ink-soft);">Not yet played</td>
-          <td class="num"></td>
+          <td class="total num">Vignesh Balan</td>
+          <td class="num"><a href="pages/week-02.html">View round &rarr;</a></td>
           <td class="num"><a href="week-02-brief.html">View brief &rarr;</a></td>
         </tr>
       </tbody>
@@ -483,6 +487,9 @@
       <li><strong>Wk1</strong> — "Team Member Card": fieldSet + 2-column aside-label fields, checkBox list, static grid. Baseline task, no dropdown/tabs/scripting required.</li>
       <li><strong>Wk1 scores</strong> — AS 70 (widget 40, layout 20, data 0, grid 0, finished 10); VB 50 (widget 25, layout 15, data 5, grid 0, finished 5); LS 30 (widget 20, layout 10, data 0, grid 0, finished 0).</li>
       <li>Common miss across all three: nobody got the grid rendering right — worth a walkthrough of grid/rowVariableName binding before next week's task.</li>
+      <li><strong>Wk2</strong> — "Team Directory": live-endpoint exception round, fieldSet + grid wired to each person's own real endpoint (no fixed data to match). See <a href="pages/week-02.html">the round overview</a> for details.</li>
+      <li><strong>Wk2 scores</strong> — VB 125 (100 base + 10 time + 15 pagination); AS 115 (100 base + 10 time + 5 extra column, tiebreak winner over LS on finish time); LS 115 (100 base + 5 time + 10 for related-action name links).</li>
+      <li>Huge turnaround from Wk1: all three nailed the full 100-pt base this round — the grid walkthrough clearly landed. Bonus points were a one-off organizer call for this round only, not a standing rubric change.</li>
     </ul>
   </div>
 

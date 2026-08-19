@@ -1,0 +1,507 @@
+<title>THE RAW BUILD — Week 2 Overview</title>
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  :root {
+    --paper: #f2f4f1;
+    --paper-raised: #ffffff;
+    --ink: #1b2430;
+    --ink-soft: #4a5568;
+    --line: rgba(27,36,48,.14);
+    --line-strong: rgba(27,36,48,.28);
+    --accent: #d98a1f;
+    --accent-ink: #7a4a0e;
+    --teal: #257a70;
+    --teal-soft: #e4f1ef;
+    --good: #2f7d4f;
+    --good-soft: #e4f2e8;
+    --bad: #b23b2e;
+    --bad-soft: #f7e6e3;
+    --shadow: 0 1px 2px rgba(27,36,48,.06), 0 8px 24px rgba(27,36,48,.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171b22;
+      --paper-raised: #1f242e;
+      --ink: #eef1f5;
+      --ink-soft: #a3adba;
+      --line: rgba(238,241,245,.14);
+      --line-strong: rgba(238,241,245,.26);
+      --accent: #f2a93b;
+      --accent-ink: #ffd694;
+      --teal: #59b3a6;
+      --teal-soft: #1b2e2c;
+      --good: #5fbf82;
+      --good-soft: #16261c;
+      --bad: #e07862;
+      --bad-soft: #2c1c19;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #171b22;
+    --paper-raised: #1f242e;
+    --ink: #eef1f5;
+    --ink-soft: #a3adba;
+    --line: rgba(238,241,245,.14);
+    --line-strong: rgba(238,241,245,.26);
+    --accent: #f2a93b;
+    --accent-ink: #ffd694;
+    --teal: #59b3a6;
+    --teal-soft: #1b2e2c;
+    --good: #5fbf82;
+    --good-soft: #16261c;
+    --bad: #e07862;
+    --bad-soft: #2c1c19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .mono {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eyebrow {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  a { color: var(--teal); }
+
+  .back-link {
+    font-size: .82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--teal);
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 2rem 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  h1.event-title {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.01em;
+    line-height: .98;
+  }
+
+  .event-date {
+    font-size: .85rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .pitch {
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+
+  .rule-strip {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-top: .25rem;
+  }
+
+  .chip {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: .3rem .6rem;
+    border-radius: 3px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-soft);
+  }
+
+  .chip.teal { color: var(--teal); background: var(--teal-soft); border-color: transparent; }
+  .chip.accent { color: var(--accent-ink); background: var(--teal-soft); border-color: transparent; }
+
+  /* ---------- Two-column spec ---------- */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 680px) {
+    .spec-grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+    letter-spacing: .02em;
+  }
+
+  table.rubric {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+  }
+
+  table.rubric th {
+    text-align: left;
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  table.rubric td {
+    padding: .55rem 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  table.rubric td:last-child {
+    text-align: right;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  table.rubric tr:last-child td { border-bottom: none; }
+
+  /* ---------- Results table ---------- */
+  table.results {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+  table.results th {
+    text-align: left;
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  table.results th.num, table.results td.num { text-align: right; }
+  table.results td {
+    padding: .7rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  table.results tr:last-child td { border-bottom: none; }
+  table.results tr.rank-1 { background: linear-gradient(90deg, var(--teal-soft), transparent 70%); }
+  td.rank {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-weight: 900;
+    color: var(--ink-soft);
+    width: 2rem;
+  }
+  tr.rank-1 td.rank { color: var(--accent-ink); }
+  td.name { font-weight: 700; }
+  td.total {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-weight: 900;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+  tr.rank-1 td.total { color: var(--accent-ink); }
+  td.breakdown {
+    font-size: .78rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Build-this section ---------- */
+  .build-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 1.75rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .build-card p.note {
+    font-size: .88rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+
+  .pmd-mock {
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  .pmd-title {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+  }
+
+  .pmd-fieldset {
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 1rem 1.2rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+  }
+
+  .pmd-fieldset > .fs-title {
+    font-weight: 700;
+    font-size: .95rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: .5rem;
+    margin-bottom: .2rem;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .7rem 1.5rem;
+  }
+  @media (max-width: 560px) {
+    .field-grid { grid-template-columns: 1fr; }
+  }
+
+  .field-row {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    font-size: .88rem;
+  }
+  .field-row .flabel {
+    color: var(--ink-soft);
+    font-weight: 600;
+    min-width: 6.5rem;
+  }
+  .field-row .fval {
+    border-bottom: 1px solid var(--line);
+    flex: 1;
+    padding-bottom: .2rem;
+  }
+
+  table.mock-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+  }
+  table.mock-grid th {
+    text-align: left;
+    background: var(--line);
+    font-size: .68rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: .4rem .6rem;
+  }
+  table.mock-grid td {
+    padding: .45rem .6rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  /* ---------- Notes ---------- */
+  ul.notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+  }
+  ul.notes li {
+    display: flex;
+    gap: .6rem;
+    font-size: .88rem;
+    color: var(--ink-soft);
+  }
+  ul.notes li::before {
+    content: "—";
+    color: var(--teal);
+    flex-shrink: 0;
+  }
+  ul.notes li strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: .82rem;
+    color: var(--ink-soft);
+    padding-top: .5rem;
+    border-top: 1px solid var(--line);
+  }
+</style>
+
+<div class="page">
+
+  <a class="back-link" href="../index.html">&larr; Back to leaderboard</a>
+
+  <div class="masthead">
+    <div class="masthead-top">
+      <h1 class="event-title">WEEK 2</h1>
+      <div class="event-date mono">Team Directory</div>
+    </div>
+    <p class="pitch">A no-assistance PMD speed build. One page, one mockup, no AI — closest match to the target, built fastest, wins.</p>
+    <div class="rule-strip">
+      <span class="chip teal">Completed</span>
+      <span class="chip">fieldSet + grid + live endpoint</span>
+      <span class="chip accent">Live-endpoint exception round</span>
+    </div>
+  </div>
+
+  <div class="spec-grid">
+    <div class="card">
+      <h2>Scoring — 100 pts base</h2>
+      <table class="rubric">
+        <thead>
+          <tr><th>Criterion</th><th>Pts</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Right widget for the job (fieldSet, grid, correct cellTemplate types)</td><td>40</td></tr>
+          <tr><td>Layout matches — header above grid, clean columns</td><td>20</td></tr>
+          <tr><td>Endpoint wired correctly (endPoints[], authType, .data binding)</td><td>15</td></tr>
+          <tr><td>Grid renders real rows/columns from that endpoint</td><td>15</td></tr>
+          <tr><td>Finished, page loads clean, before time's up</td><td>10</td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="font-size:.8rem; color:var(--ink-soft); margin:0;">Bonus points awarded on top of the 100-pt base this round for going beyond scope — a one-off organizer call, not a permanent rubric change.</p>
+    </div>
+
+    <div class="card">
+      <h2>Results</h2>
+      <table class="results">
+        <thead>
+          <tr><th>#</th><th>Name</th><th class="num">Score</th></tr>
+        </thead>
+        <tbody>
+          <tr class="rank-1">
+            <td class="rank">1</td>
+            <td class="name">Vignesh Balan</td>
+            <td class="total num">125</td>
+          </tr>
+          <tr>
+            <td class="rank">2</td>
+            <td class="name">Abinaya Sivakumar</td>
+            <td class="total num">115</td>
+          </tr>
+          <tr>
+            <td class="rank">3</td>
+            <td class="name">Lavanya Suji</td>
+            <td class="total num">115</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="build-card">
+    <div>
+      <div class="eyebrow" style="margin-bottom:.35rem;">Target mockup — Team Directory</div>
+      <p class="note">One fieldSet, one grid. Rows come from a real, live endpoint each participant picked themselves — no fixed data to match, just correct wiring.</p>
+    </div>
+
+    <div class="pmd-mock">
+      <div class="pmd-title">Team Directory</div>
+
+      <div class="pmd-fieldset">
+        <div class="fs-title">Team Directory</div>
+        <div class="field-grid">
+          <div class="field-row"><span class="flabel">Source</span><span class="fval">Live — endpoint of choice</span></div>
+        </div>
+        <table class="mock-grid" style="margin-top:.6rem;">
+          <thead><tr><th>Name</th><th>Job Title</th><th>Initials</th></tr></thead>
+          <tbody>
+            <tr><td>(from endpoint)</td><td>(from endpoint)</td><td>(computed)</td></tr>
+            <tr><td>(from endpoint)</td><td>(from endpoint)</td><td>(computed)</td></tr>
+            <tr><td>(from endpoint)</td><td>(from endpoint)</td><td>(computed)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Notes</h2>
+    <ul class="notes">
+      <li><strong>Task:</strong> "Team Directory" — fieldSet + grid bound to a real live endpoint of each participant's own choosing, instead of hardcoded data (organizer exception for this round only — see <a href="../week-02-brief.html">the Week 2 brief</a>).</li>
+      <li><strong>Scores:</strong> VB 125 (100 base + 10 time + 15 pagination) — went furthest beyond scope. AS 115 (100 base + 10 time + 5 extra column) — won the tiebreak over LS on faster finish. LS 115 (100 base + 5 time + 10 for rendering names as related-action links in the grid).</li>
+      <li>Big turnaround from Week 1: all three nailed the full 100-pt base this time (right widget, layout, endpoint wired, grid rendering, finished on time) — the grid walkthrough after Week 1 clearly landed.</li>
+      <li>Bonus points this round were an explicit one-off organizer call, not a standing rubric change — future weeks default back to the fixed 100-pt scale unless stated otherwise.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <span>Answer key: <a href="../../tasks/week-02-live-team-grid.pmd">tasks/week-02-live-team-grid.pmd</a></span>
+    <span class="mono">Week 2</span>
+  </footer>
+
+</div>
