@@ -1,0 +1,86 @@
+{
+    "id": "RawBuildAnswerKeyWeek2",
+    "endPoints": [
+        {
+            "name": "getTeamMembers",
+            "baseUrlType": "workday-staffing",
+            "url": "workers?search=Fernandez&limit=20",
+            "authType": "sso",
+            "httpMethod": "GET",
+            "failOnStatusCodes": [
+                { "code": 400 },
+                { "code": 403 }
+            ]
+        }
+    ],
+    "presentation": {
+        "title": {
+            "type": "title",
+            "label": "Team Directory"
+        },
+        "preferredLabelPosition": "aside",
+        "body": {
+            "type": "section",
+            "children": [
+                {
+                    "type": "fieldSet",
+                    "id": "directorySection",
+                    "title": "Team Directory",
+                    "children": [
+                        {
+                            "type": "text",
+                            "id": "directoryNote",
+                            "label": "Source",
+                            "labelPosition": "aside",
+                            "enabled": false,
+                            "value": "Live — Workday Staffing API"
+                        },
+                        {
+                            "type": "grid",
+                            "id": "teamGrid",
+                            "label": "Team Members",
+                            "rows": "<% getTeamMembers.data %>",
+                            "rowVariableName": "worker",
+                            "columns": [
+                                {
+                                    "type": "column",
+                                    "columnId": "nameCol",
+                                    "label": "Name",
+                                    "sortableAndFilterable": true,
+                                    "cellTemplate": {
+                                        "type": "text",
+                                        "id": "nameCell",
+                                        "enabled": false,
+                                        "value": "<% worker.descriptor %>"
+                                    }
+                                },
+                                {
+                                    "type": "column",
+                                    "columnId": "titleCol",
+                                    "label": "Job Title",
+                                    "cellTemplate": {
+                                        "type": "text",
+                                        "id": "titleCell",
+                                        "enabled": false,
+                                        "value": "<% ((worker ?? {}).primaryJob ?? {}).businessTitle ?? '' %>"
+                                    }
+                                },
+                                {
+                                    "type": "column",
+                                    "columnId": "initialsCol",
+                                    "label": "Initials",
+                                    "cellTemplate": {
+                                        "type": "text",
+                                        "id": "initialsCell",
+                                        "enabled": false,
+                                        "value": "<% !empty worker.descriptor ? worker.descriptor.substring(0,1) : '' %>"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
