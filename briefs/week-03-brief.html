@@ -1,0 +1,626 @@
+<title>THE RAW BUILD — Week 3</title>
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  :root {
+    --paper: #f2f4f1;
+    --paper-raised: #ffffff;
+    --ink: #1b2430;
+    --ink-soft: #4a5568;
+    --line: rgba(27,36,48,.14);
+    --line-strong: rgba(27,36,48,.28);
+    --accent: #d98a1f;
+    --accent-ink: #7a4a0e;
+    --teal: #257a70;
+    --teal-soft: #e4f1ef;
+    --good: #2f7d4f;
+    --good-soft: #e4f2e8;
+    --bad: #b23b2e;
+    --bad-soft: #f7e6e3;
+    --shadow: 0 1px 2px rgba(27,36,48,.06), 0 8px 24px rgba(27,36,48,.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171b22;
+      --paper-raised: #1f242e;
+      --ink: #eef1f5;
+      --ink-soft: #a3adba;
+      --line: rgba(238,241,245,.14);
+      --line-strong: rgba(238,241,245,.26);
+      --accent: #f2a93b;
+      --accent-ink: #ffd694;
+      --teal: #59b3a6;
+      --teal-soft: #1b2e2c;
+      --good: #5fbf82;
+      --good-soft: #16261c;
+      --bad: #e07862;
+      --bad-soft: #2c1c19;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #171b22;
+    --paper-raised: #1f242e;
+    --ink: #eef1f5;
+    --ink-soft: #a3adba;
+    --line: rgba(238,241,245,.14);
+    --line-strong: rgba(238,241,245,.26);
+    --accent: #f2a93b;
+    --accent-ink: #ffd694;
+    --teal: #59b3a6;
+    --teal-soft: #1b2e2c;
+    --good: #5fbf82;
+    --good-soft: #16261c;
+    --bad: #e07862;
+    --bad-soft: #2c1c19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .mono {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eyebrow {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 2rem 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  h1.event-title {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.01em;
+    line-height: .98;
+  }
+
+  .event-date {
+    font-size: .85rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .pitch {
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+
+  .rule-strip {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-top: .25rem;
+  }
+
+  .chip {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: .3rem .6rem;
+    border-radius: 3px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-soft);
+  }
+
+  .chip.no-ai { color: var(--bad); background: var(--bad-soft); border-color: transparent; }
+  .chip.solo { color: var(--teal); background: var(--teal-soft); border-color: transparent; }
+
+  /* ---------- Timer ---------- */
+  .timer-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .timer-readout {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(2.4rem, 8vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--ink);
+  }
+
+  .timer-readout.running { color: var(--accent-ink); }
+  .timer-readout.expired { color: var(--bad); }
+
+  .timer-controls {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+  }
+
+  .preset-row, .action-row {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink);
+    padding: .4rem .75rem;
+    font-size: .82rem;
+    font-weight: 600;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  }
+
+  button:hover { background: var(--line); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  button.preset.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+  }
+
+  button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #251505;
+  }
+  button.primary:hover { filter: brightness(1.05); }
+
+  /* ---------- Two-column spec ---------- */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 680px) {
+    .spec-grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+    letter-spacing: .02em;
+  }
+
+  ul.rules {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+  }
+
+  ul.rules li {
+    display: flex;
+    gap: .6rem;
+    font-size: .92rem;
+    color: var(--ink-soft);
+  }
+
+  ul.rules li::before {
+    content: "—";
+    color: var(--teal);
+    flex-shrink: 0;
+  }
+
+  ul.rules li strong { color: var(--ink); font-weight: 600; }
+
+  table.rubric {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+  }
+
+  table.rubric th {
+    text-align: left;
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  table.rubric td {
+    padding: .55rem 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  table.rubric td:last-child {
+    text-align: right;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  table.rubric tr:last-child td { border-bottom: none; }
+
+  .rubric-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: .95rem;
+    padding-top: .4rem;
+    border-top: 2px solid var(--ink);
+  }
+  .rubric-total .mono { font-size: 1.1rem; }
+
+  /* ---------- Build-this section ---------- */
+  .build-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 1.75rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .build-card p.note {
+    font-size: .88rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+
+  /* mimic the Extend PMD look: bordered fieldSet, aside labels */
+  .pmd-mock {
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  .pmd-title {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+  }
+
+  .pmd-fieldset {
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 1rem 1.2rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+  }
+
+  .pmd-fieldset > .fs-title {
+    font-weight: 700;
+    font-size: .95rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: .5rem;
+    margin-bottom: .2rem;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .7rem 1.5rem;
+  }
+  @media (max-width: 560px) {
+    .field-grid { grid-template-columns: 1fr; }
+  }
+
+  .field-row {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    font-size: .88rem;
+  }
+  .field-row .flabel {
+    color: var(--ink-soft);
+    font-weight: 600;
+    min-width: 6.5rem;
+  }
+  .field-row .fval {
+    border-bottom: 1px solid var(--line);
+    flex: 1;
+    padding-bottom: .2rem;
+  }
+
+  .checks {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    font-size: .88rem;
+  }
+  .check-item { display: flex; align-items: center; gap: .5rem; }
+  .check-box {
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .check-box.on { background: var(--teal); border-color: var(--teal); color: #fff; font-size: .65rem; }
+
+  table.mock-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+  }
+  table.mock-grid th {
+    text-align: left;
+    background: var(--line);
+    font-size: .68rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: .4rem .6rem;
+  }
+  table.mock-grid td {
+    padding: .45rem .6rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .status-pill {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 700;
+    padding: .1rem .5rem;
+    border-radius: 999px;
+  }
+  .status-pill.done { background: var(--good-soft); color: var(--good); }
+  .status-pill.progress { background: var(--teal-soft); color: var(--teal); }
+  .status-pill.pending { background: var(--line); color: var(--ink-soft); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: .82rem;
+    color: var(--ink-soft);
+    padding-top: .5rem;
+    border-top: 1px solid var(--line);
+  }
+</style>
+
+<div class="page">
+
+  <div class="masthead">
+    <div class="masthead-top">
+      <h1 class="event-title">THE RAW BUILD</h1>
+      <div class="event-date mono" id="event-date"></div>
+    </div>
+    <p class="pitch">A no-assistance PMD speed build. One page, one mockup, no AI — closest match to the target, built fastest, wins.</p>
+    <p class="pitch" style="font-size:.9rem;"><strong>Week 3 exception, organizer's call:</strong> this round saves real data via an outbound endpoint, instead of read-only hardcoded data — see Rules for what that changes.</p>
+    <div class="rule-strip">
+      <span class="chip no-ai">No AI tools</span>
+      <span class="chip solo">Solo build</span>
+      <span class="chip">Workday Extend PMD</span>
+      <span class="chip">Judged on the clock</span>
+    </div>
+  </div>
+
+  <div class="timer-card">
+    <div>
+      <div class="eyebrow" style="margin-bottom:.4rem;">Build clock</div>
+      <div class="timer-readout mono" id="timer-readout">30:00</div>
+    </div>
+    <div class="timer-controls">
+      <div class="preset-row">
+        <button class="preset" data-mins="30">30 min</button>
+        <button class="preset active" data-mins="45">45 min</button>
+        <button class="preset" data-mins="60">60 min</button>
+      </div>
+      <!-- default preset for Week 3: 45 min, per organizer's call — outbound endpoint + BO save is a new skill -->
+      <div class="action-row">
+        <button class="primary" id="timer-start">Start</button>
+        <button id="timer-pause">Pause</button>
+        <button id="timer-reset">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-grid">
+    <div class="card">
+      <h2>Rules</h2>
+      <ul class="rules">
+        <li><strong>No AI, of any kind.</strong> No Claude, Copilot, ChatGPT, or similar — for code, layout, or debugging.</li>
+        <li><strong>Fair game:</strong> official Workday docs, this project's own existing .pmd files, your own memory and notes.</li>
+        <li><strong>Solo, one file.</strong> A single .pmd edit page, built and previewed in Studio.</li>
+        <li><strong>Live BO save this week (exception):</strong> save the form to any business object you already have access to in your own tenant/app — an existing custom BO, a scratch/test one, whatever you're set up for. The exact BO doesn't have to match anyone else's; what's judged is that the outbound endpoint and field bindings are wired correctly.</li>
+        <li><strong>Don't wait on new provisioning.</strong> Use a BO that already exists and is deployed today — this round isn't the time to stand up a brand-new one from scratch.</li>
+        <li><strong>Submit by showing your Preview</strong> to the judge when the clock runs out, finished or not — click Save/OK once if it's wired up, to prove the round-trip works.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Scoring — 100 pts</h2>
+      <table class="rubric">
+        <thead>
+          <tr><th>Criterion</th><th>Pts</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Right widget for the job (fieldSet, 3 correct input types, edit page)</td><td>40</td></tr>
+          <tr><td>Layout matches — stacked inputs, aside labels</td><td>20</td></tr>
+          <tr><td>Outbound endpoint configured correctly (outboundData, POST, url)</td><td>25</td></tr>
+          <tr><td>Finished, save round-trip proven, before time's up</td><td>15</td></tr>
+        </tbody>
+      </table>
+      <div class="rubric-total"><span>Total</span><span class="mono">100</span></div>
+      <p class="note" style="font-size:.8rem; color:var(--ink-soft); margin:0;">No grid this round — its 15 pts were redistributed into outbound-endpoint config (+10) and finish/round-trip (+5), per CLAUDE.md's rule for a task that doesn't exercise every rubric dimension.</p>
+    </div>
+  </div>
+
+  <div class="build-card">
+    <div>
+      <div class="eyebrow" style="margin-bottom:.35rem;">Build this — Feedback Form</div>
+      <p class="note">A single edit page, 3 inputs, one fieldSet. On save, each field's value posts to an outbound endpoint targeting a business object you already have access to. Structure below is the target — the actual saved record just needs to genuinely land in your BO.</p>
+    </div>
+
+    <div class="pmd-mock">
+      <div class="pmd-title">Feedback Form</div>
+
+      <div class="pmd-fieldset">
+        <div class="fs-title">Feedback</div>
+        <div class="field-grid" style="grid-template-columns: 1fr;">
+          <div class="field-row"><span class="flabel">Name</span><span class="fval">&nbsp;</span></div>
+          <div class="field-row"><span class="flabel">Email</span><span class="fval">&nbsp;</span></div>
+          <div class="field-row"><span class="flabel">Comments</span><span class="fval">&nbsp;</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>Judge checks outbound wiring + a real saved record against this page. Ties broken by finish time.</span>
+    <span class="mono">Week 3</span>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var totalSeconds = 45 * 60;
+    var remaining = totalSeconds;
+    var timerId = null;
+    var readout = document.getElementById('timer-readout');
+    var startBtn = document.getElementById('timer-start');
+    var pauseBtn = document.getElementById('timer-pause');
+    var resetBtn = document.getElementById('timer-reset');
+    var presets = document.querySelectorAll('.preset');
+
+    var dateEl = document.getElementById('event-date');
+    dateEl.textContent = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
+    function format(s) {
+      var m = Math.floor(s / 60);
+      var sec = s % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    function render() {
+      readout.textContent = format(remaining);
+      readout.classList.toggle('running', timerId !== null && remaining > 0);
+      readout.classList.toggle('expired', remaining === 0);
+    }
+
+    function tick() {
+      remaining -= 1;
+      if (remaining <= 0) {
+        remaining = 0;
+        clearInterval(timerId);
+        timerId = null;
+      }
+      render();
+    }
+
+    startBtn.addEventListener('click', function () {
+      if (timerId !== null || remaining === 0) return;
+      timerId = setInterval(tick, 1000);
+      render();
+    });
+
+    pauseBtn.addEventListener('click', function () {
+      if (timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+        render();
+      }
+    });
+
+    resetBtn.addEventListener('click', function () {
+      clearInterval(timerId);
+      timerId = null;
+      var active = document.querySelector('.preset.active');
+      totalSeconds = (active ? parseInt(active.dataset.mins, 10) : 30) * 60;
+      remaining = totalSeconds;
+      render();
+    });
+
+    presets.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        presets.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        clearInterval(timerId);
+        timerId = null;
+        totalSeconds = parseInt(btn.dataset.mins, 10) * 60;
+        remaining = totalSeconds;
+        render();
+      });
+    });
+
+    render();
+  })();
+</script>

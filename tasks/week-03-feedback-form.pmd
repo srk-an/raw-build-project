@@ -1,0 +1,63 @@
+{
+    "id": "RawBuildAnswerKeyWeek3",
+    "outboundData": {
+        "outboundEndPoints": [
+            {
+                "name": "saveFeedback",
+                "baseUrlType": "app",
+                "url": "feedbackSubmissions",
+                "httpMethod": "POST"
+            }
+        ]
+    },
+    "presentation": {
+        "pageType": "EDIT",
+        "title": {
+            "type": "title",
+            "label": "Feedback Form"
+        },
+        "preferredLabelPosition": "aside",
+        "body": {
+            "type": "section",
+            "children": [
+                {
+                    "type": "fieldSet",
+                    "id": "feedbackSection",
+                    "title": "Feedback",
+                    "children": [
+                        {
+                            "type": "text",
+                            "id": "nameInput",
+                            "label": "Name",
+                            "labelPosition": "aside",
+                            "required": true,
+                            "valuesOut": [
+                                { "value": "<% self.value %>", "valueOutBinding": "saveFeedback.name" }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "id": "emailInput",
+                            "label": "Email",
+                            "labelPosition": "aside",
+                            "required": true,
+                            "valuesOut": [
+                                { "value": "<% self.value %>", "valueOutBinding": "saveFeedback.email" }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "id": "commentsInput",
+                            "label": "Comments",
+                            "labelPosition": "aside",
+                            "multiline": true,
+                            "valuesOut": [
+                                { "value": "<% self.value %>", "valueOutBinding": "saveFeedback.comments" }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
