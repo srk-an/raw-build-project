@@ -156,6 +156,24 @@
 
   .chip.teal { color: var(--teal); background: var(--teal-soft); border-color: transparent; }
 
+  .error-guide-btn {
+    align-self: flex-start;
+    margin-top: .3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .85rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    padding: .55rem .9rem;
+    transition: background-color .15s ease, border-color .15s ease;
+  }
+  .error-guide-btn:hover { background: var(--line); border-color: var(--accent); }
+
   /* ---------- Podium ---------- */
   .podium {
     display: grid;
@@ -378,6 +396,9 @@
       <span class="chip">Workday Extend PMD</span>
       <span class="chip">1 week played</span>
     </div>
+    <a class="error-guide-btn" href="https://claude.ai/artifact/7bzaP88sY55PMig1p6TEL7" target="_blank" rel="noopener">
+      <span>🛠️</span> Check PMD Error Field Guide
+    </a>
   </div>
 
   <div class="podium">
