@@ -1,0 +1,362 @@
+<title>PMD Error Field Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ink: #171b21;
+    --ink-soft: #565f6d;
+    --paper: #f4f5f7;
+    --surface: #ffffff;
+    --line: rgba(23,27,33,.12);
+    --line-strong: rgba(23,27,33,.24);
+    --accent: #b8481f;
+    --accent-soft: #fbe9e1;
+    --accent-ink: #7a2f13;
+    --good: #256d4a;
+    --good-soft: #e2f1e9;
+    --code-bg: #f0efe9;
+    --code-ink: #2a2f22;
+    --shadow: 0 1px 2px rgba(23,27,33,.05), 0 6px 20px rgba(23,27,33,.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eef0f3;
+      --ink-soft: #a6afbd;
+      --paper: #14171c;
+      --surface: #1c2128;
+      --line: rgba(238,240,243,.12);
+      --line-strong: rgba(238,240,243,.24);
+      --accent: #e08355;
+      --accent-soft: #3a2016;
+      --accent-ink: #f3b593;
+      --good: #6bc296;
+      --good-soft: #16281f;
+      --code-bg: #23271f;
+      --code-ink: #d8dccb;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eef0f3;
+    --ink-soft: #a6afbd;
+    --paper: #14171c;
+    --surface: #1c2128;
+    --line: rgba(238,240,243,.12);
+    --line-strong: rgba(238,240,243,.24);
+    --accent: #e08355;
+    --accent-soft: #3a2016;
+    --accent-ink: #f3b593;
+    --good: #6bc296;
+    --good-soft: #16281f;
+    --code-bg: #23271f;
+    --code-ink: #d8dccb;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", Arial, sans-serif;
+    line-height: 1.55;
+    padding-block: 2.25rem 4rem;
+    padding-inline: 1.1rem;
+  }
+  .mono { font-family: "IBM Plex Mono", "Courier New", monospace; }
+
+  .page { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.6rem; }
+
+  header.masthead { display: flex; flex-direction: column; gap: .6rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace; font-size: .72rem; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink);
+  }
+  h1 {
+    margin: 0; font-size: clamp(1.7rem, 4vw, 2.3rem); font-weight: 700;
+    letter-spacing: -.01em; text-wrap: balance;
+  }
+  .lede { margin: 0; color: var(--ink-soft); font-size: 1rem; max-width: 64ch; }
+
+  .toolbar {
+    position: sticky; top: env(safe-area-inset-top, 0px);
+    z-index: 5; background: var(--paper); padding-block: .6rem;
+    display: flex; flex-direction: column; gap: .65rem;
+  }
+  .search-row { display: flex; gap: .5rem; align-items: center; }
+  .search-box {
+    flex: 1; display: flex; align-items: center; gap: .5rem;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: 8px; padding: .6rem .8rem; box-shadow: var(--shadow);
+  }
+  .search-box svg { flex-shrink: 0; color: var(--ink-soft); }
+  .search-box input {
+    border: 0; outline: 0; background: transparent; color: var(--ink);
+    font: inherit; font-size: .95rem; width: 100%;
+  }
+  .search-box input::placeholder { color: var(--ink-soft); }
+  .count { font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: var(--ink-soft); white-space: nowrap; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chip {
+    font-family: "IBM Plex Mono", monospace; font-size: .72rem; font-weight: 500;
+    padding: .32rem .65rem; border-radius: 999px; border: 1px solid var(--line-strong);
+    background: var(--surface); color: var(--ink-soft); cursor: pointer;
+    user-select: none; transition: background-color .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  ol.catalog { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1rem; counter-reset: err; }
+
+  .card {
+    counter-increment: err;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: var(--shadow); padding: 1.1rem 1.25rem 1.25rem; scroll-margin-top: 6.5rem;
+  }
+  .card-top { display: flex; align-items: flex-start; gap: .8rem; }
+  .num {
+    font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: .8rem;
+    color: var(--ink-soft); flex-shrink: 0; width: 1.6rem; padding-top: .18rem;
+  }
+  .num::before { content: counter(err, decimal-leading-zero); }
+  .card-head { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .35rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; letter-spacing: -.005em; text-wrap: balance; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .tag {
+    font-family: "IBM Plex Mono", monospace; font-size: .68rem; font-weight: 500;
+    padding: .15rem .5rem; border-radius: 5px; background: var(--paper);
+    border: 1px solid var(--line); color: var(--ink-soft);
+  }
+  .tag.widget { color: var(--accent-ink); background: var(--accent-soft); border-color: transparent; }
+
+  .msg-block {
+    margin-top: .85rem; background: var(--code-bg); border: 1px solid var(--line);
+    border-radius: 7px; padding: .7rem .85rem; overflow-x: auto;
+  }
+  .msg-block .label {
+    font-family: "IBM Plex Mono", monospace; font-size: .65rem; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: .35rem; display: block;
+  }
+  .msg-block pre {
+    margin: 0; font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--code-ink);
+    white-space: pre-wrap; word-break: break-word; line-height: 1.5;
+  }
+
+  .section { margin-top: .85rem; }
+  .section .label {
+    font-family: "IBM Plex Mono", monospace; font-size: .65rem; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: .3rem; display: block;
+  }
+  .section p { margin: 0; font-size: .92rem; color: var(--ink); }
+  .section.fix { padding: .6rem .8rem; background: var(--good-soft); border-radius: 7px; }
+  .section.fix .label { color: var(--good); }
+  .section.fix p { color: var(--ink); }
+
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--ink-soft); }
+  .empty strong { color: var(--ink); }
+
+  footer {
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    font-size: .78rem; color: var(--ink-soft); padding-top: .8rem; border-top: 1px solid var(--line);
+  }
+
+  .back-link {
+    font-size: .82rem; font-weight: 600; text-decoration: none; color: var(--accent-ink);
+    align-self: flex-start;
+  }
+  .back-link:hover { text-decoration: underline; }
+</style>
+
+<div class="page">
+
+  <a class="back-link" href="index.html">&larr; Back to leaderboard</a>
+
+  <header class="masthead">
+    <span class="eyebrow">Workday Extend &middot; PMD</span>
+    <h1>PMD Error Field Guide</h1>
+    <p class="lede">A running catalog of real PMD errors we've hit &mdash; the exact message, why it actually happens, and the fix. Search by error text, tag id, or cause before you start debugging from scratch.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-row">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M11.5 11.5L14.5 14.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <input id="search" type="search" placeholder="Search error text, tag id, cause…" autocomplete="off">
+      </div>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="filters" id="filters"></div>
+  </div>
+
+  <ol class="catalog" id="catalog"></ol>
+
+  <p class="empty" id="empty" hidden>No matches &mdash; try a different <strong>term</strong> or clear the filter.</p>
+
+  <footer>
+    <span>Add a new entry the next time you close out an error &mdash; future-you (and everyone else) will thank you.</span>
+    <span class="mono">v1</span>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  const ERRORS = [
+    {
+      title: "Endpoint URL fails to resolve — stray space before the path",
+      tags: ["endpoint", "url"],
+      message: "Page Error\nError while attempting to check or create endpoint url for workersEndpoint with current url error_while_encoding",
+      cause: "The baseUrlType was correct, but the endpoint's url value had a leading space — ‘ /workers’ instead of ‘/workers’. Workday tries to encode that malformed URL and fails outright.",
+      fix: "Check the literal url string character by character for a stray leading space (easy to introduce with copy-paste or string concatenation). Remove it so the path starts directly with ‘/’."
+    },
+    {
+      title: "number widget: no value specified for BigDecimal",
+      tags: ["number", "widget"],
+      message: "Page Error\nException thrown while processing PMD script in tag of type 'number' with id 'inputResolution' declared at 'editSlaPolicyPage'\nNo value specified for 'BigDecimal'.",
+      cause: "An empty string '' was assigned to a number-type field. number expects a numeric (BigDecimal) value or null — an empty string isn't a valid empty state for it the way it is for text.",
+      fix: "Use 0 or null as the empty/default value for a number field, never ''."
+    },
+    {
+      title: "App source fails to parse — escaped single quote in JSON",
+      tags: ["json", "deploy", "parse"],
+      message: "Page Error\nInternal Server Error. [I|4860f311-73b8-46d8-a40b-39fd140fe283]\nAn error occurred while parsing the app source: Could not read data as com.fasterxml.jackson.databind.node.ObjectNode because Unrecognized character escape ''' (code 39)\nat [Source: REDACTED (StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION disabled); line: 39, column: 132]",
+      cause: "A value inside a JSON string (e.g. an endpoint url) used \\' to escape a single quote, like wrapping \\'Admin. JSON only recognizes \\\", \\\\, \\/, \\b, \\f, \\n, \\r, \\t, and \\uXXXX as escapes — \\' is not one of them, and a single quote never needs escaping in JSON in the first place. Jackson hits the unrecognized escape and fails to parse the whole app source.",
+      fix: "Never escape a single quote in a JSON string — it doesn't need it. If you need to wrap a literal value inside a JSON string, use \\\" (a valid JSON escape) the way currentUserSecGET's WQL value does, not \\'."
+    },
+    {
+      title: "grid script exceeds the max memory limit",
+      tags: ["grid", "widget", "performance"],
+      message: "Page Error\nInternal Server Error. [I|69901da0-e692-46e8-927d-ee3e3d3eacfb]\nException thrown while processing PMD script in tag of type 'grid' with id 'viewAllGrid' declared at 'ListReleasePlanner'\nScript Constraint exceeded: Script/Expression used more than the allowed max memory limit.",
+      cause: "The script backing the grid was processing more than roughly 100KB of data in one page — e.g. filtering/mapping a large list directly in a presentation expression or script function every time the grid rendered.",
+      fix: "Reduce how much data the script processes at once. Prefer server-side filtering/pagination over pulling a whole large dataset into script, and use more efficient data structures (a HashMap-style lookup instead of repeated linear filter() scans) to cut down on redundant processing."
+    },
+    {
+      title: "Unknown Variable — case-sensitive field name typo",
+      tags: ["text", "widget", "typo"],
+      message: "Page Error\nException thrown while processing PMD script in tag of type 'text' with id 'assignedto' declared at 'editReleasePlannerDetails'\nUnknown Variable found: getReleasePlannerDetails.assignedto\nScript Excerpt: getReleasePlannerDetails.assignedto",
+      cause: "PMD variable/field references are case-sensitive. The script referenced .assignedto (all lowercase) when the real field on the endpoint response was assignedTo (camelCase) — a near-invisible typo.",
+      fix: "Check the exact casing of the field on the actual endpoint/BO response and match it exactly in script — don't assume lowercase or guess the casing from the widget id."
+    },
+    {
+      title: "Property Error found: 0 — indexing into a null array",
+      tags: ["array", "null"],
+      message: "Page Error\nInternal Server Error. [I|17db9227-fd87-493c-be6e-104dbb71a2fd]\nProperty Error found: 0\nScript Excerpt: status.value[0]",
+      cause: "status.value[0] was evaluated while status.value itself was null/empty — there's nothing at index 0 of a null array, so PMD throws a property error naming the index (0) rather than a clearer null message.",
+      fix: "Null-guard before indexing: check !empty(status.value) (or an equivalent length/size check) before reading status.value[0], and decide what the field should show when the array is genuinely empty."
+    },
+    {
+      title: "Unrecognized field — BO configured but not deployed",
+      tags: ["business-object", "deploy"],
+      message: "Page Error\nUnrecognized field releaseId",
+      cause: "The business object was configured in Studio (the field exists in the model) but the app hasn't actually been deployed since that change — so the running app's schema doesn't know about the field yet.",
+      fix: "Deploy/republish the app after any business object change, and confirm the deployment succeeded before assuming the PMD/field reference itself is wrong."
+    },
+    {
+      title: "404 Not Found on workers/me",
+      tags: ["endpoint", "auth", "staffing-api"],
+      message: "404 URL Not Found\nworkers/me",
+      cause: "Either the endpoint URL itself is wrong, or (just as commonly) the calling user is an Implementer account — an Implementer has no worker record, so workers/me has nothing to return and 404s even though the endpoint config is correct.",
+      fix: "Double-check the URL first. If it's correct, check whether the account hitting the endpoint is a real worker vs. an Implementer/service account — test with a real worker's credentials if so."
+    },
+    {
+      title: "Unknown Function call .invoke()",
+      tags: ["endpoint", "script", "invoke"],
+      message: "Page Error\nUnknown Function call .invoke()",
+      cause: ".invoke() was called on something that either isn't a function/endpoint object at all, or is an endpoint that isn't marked deferred: true. Only a deferred inbound endpoint supports being invoked explicitly from script with .invoke({...}).",
+      fix: "If you need to call an endpoint on demand from script (e.g. per grid row, or from another widget's onChange), add \"deferred\": true to that endpoint's definition. If it's meant to load automatically, don't call .invoke() on it at all — just reference endpointName.data directly."
+    },
+    {
+      title: "414 error — request URL too large",
+      tags: ["endpoint", "url", "414"],
+      message: "414 Request-URI Too Large",
+      cause: "The endpoint's request URL grew past the server's max length — usually from stuffing too many/too-large query params (long comma-separated id lists, verbose filters, etc.) directly into the URL string.",
+      fix: "Reduce what's carried in the query string: trim unnecessary query params, page/batch large id lists instead of sending them all at once, and move data that doesn't need to be in the URL into other variables (e.g. pageVariables, an outbound body) instead of appending it to the URL."
+    },
+    {
+      title: "Page script validation fails — non-function content in the script block",
+      tags: ["script", "deploy"],
+      message: "Page Error\nInternal Server Error. [I|55da6b3a-be61-4929-bcac-bba463a334ed]\nPage script validation fails - only function definition is allowed in page script.",
+      cause: "The top-level \"script\" block on the page contained something other than a function definition — here, a var assignment/flag sitting directly at the top level instead of inside a function or referenced via pageVariables.",
+      fix: "Keep the script block to function definitions only. Move any variable assignment either inside a function body, or use pageVariables to hold state that needs to be shared across widgets/functions."
+    },
+    {
+      title: "One unresolved symbol cascades into every widget that references it",
+      tags: ["script", "endpoint", "widget", "cascading"],
+      message: "Page Error\n11 error(s) on page in App Preview: viewChanges\nviewChanges.pmd.presentation.body.children[1].onChange: PMD Scripting Undefined Function: CheckBoxTag:onChange failed with getImplementationType\nviewChanges.pmd.presentation.body.children[2].rows: PMD Scripting Undefined Function: GridTag:rows failed with getImplementationType\nviewChanges.pmd.presentation.body.children[2].columns[0].cellTemplate.value: PMD Scripting Undefined Function: DateTag:value failed with getImplementationType\n... (repeats for every column's cellTemplate.value)\nviewChanges.pmd.endPoints[0].url: PMD Scripting Undefined Function: EndPoint:url failed with getImplementationType\nviewChanges.pmd.script: PMD Scripting Undefined Function: Pmd:script failed with getImplementationType",
+      cause: "getImplementationType (an endpoint or variable) wasn't properly resolved/scoped — e.g. renamed, removed, or never actually declared where it's used. Because it's referenced from the checkbox's onChange, the grid's rows, every column's cellTemplate, the endpoint's own url, and the script block itself, PMD throws a separate \"Undefined Function\" error at every single call site that touches it, making one root cause look like 11 unrelated failures.",
+      fix: "Don't chase each error individually — they all share the same broken symbol. Find where getImplementationType is supposed to be defined (an endpoint name or a script function) and fix or restore that one declaration; once it resolves correctly, every dependent error clears at once."
+    }
+  ];
+
+  const catalog = document.getElementById("catalog");
+  const filtersEl = document.getElementById("filters");
+  const searchEl = document.getElementById("search");
+  const countEl = document.getElementById("count");
+  const emptyEl = document.getElementById("empty");
+
+  const allTags = Array.from(new Set(ERRORS.flatMap(e => e.tags))).sort();
+  let activeTag = null;
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function renderChips() {
+    filtersEl.innerHTML = "";
+    allTags.forEach(tag => {
+      const chip = document.createElement("button");
+      chip.className = "chip" + (activeTag === tag ? " active" : "");
+      chip.textContent = tag;
+      chip.type = "button";
+      chip.addEventListener("click", () => {
+        activeTag = activeTag === tag ? null : tag;
+        renderChips();
+        renderCards();
+      });
+      filtersEl.appendChild(chip);
+    });
+  }
+
+  function renderCards() {
+    const q = searchEl.value.trim().toLowerCase();
+    const filtered = ERRORS.filter(e => {
+      const matchesTag = !activeTag || e.tags.includes(activeTag);
+      const haystack = (e.title + " " + e.message + " " + e.cause + " " + e.fix + " " + e.tags.join(" ")).toLowerCase();
+      const matchesQuery = !q || haystack.includes(q);
+      return matchesTag && matchesQuery;
+    });
+
+    catalog.innerHTML = filtered.map(e => `
+      <li class="card">
+        <div class="card-top">
+          <span class="num"></span>
+          <div class="card-head">
+            <div class="card-title">${escapeHtml(e.title)}</div>
+            <div class="tag-row">${e.tags.map(t => `<span class="tag${t === "widget" ? " widget" : ""}">${escapeHtml(t)}</span>`).join("")}</div>
+          </div>
+        </div>
+        <div class="msg-block">
+          <span class="label">Error message</span>
+          <pre>${escapeHtml(e.message)}</pre>
+        </div>
+        <div class="section">
+          <span class="label">Why it happens</span>
+          <p>${escapeHtml(e.cause)}</p>
+        </div>
+        <div class="section fix">
+          <span class="label">Fix</span>
+          <p>${escapeHtml(e.fix)}</p>
+        </div>
+      </li>
+    `).join("");
+
+    countEl.textContent = filtered.length + " of " + ERRORS.length;
+    emptyEl.hidden = filtered.length !== 0;
+  }
+
+  searchEl.addEventListener("input", renderCards);
+  renderChips();
+  renderCards();
+})();
+</script>
