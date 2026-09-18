@@ -1,0 +1,46 @@
+{
+    "id": "contactConfirm",
+    "presentation": {
+        "title": {
+            "type": "title",
+            "label": "Contact Card — Submitted"
+        },
+        "preferredLabelPosition": "aside",
+        "body": {
+            "type": "section",
+            "children": [
+                {
+                    "type": "fieldSet",
+                    "id": "confirmSection",
+                    "title": "Submitted Details",
+                    "children": [
+                        {
+                            "type": "text",
+                            "id": "nameValue",
+                            "label": "Name",
+                            "labelPosition": "aside",
+                            "enabled": false,
+                            "value": "<% flowVariables.name ?: '' %>"
+                        },
+                        {
+                            "type": "text",
+                            "id": "emailValue",
+                            "label": "Email",
+                            "labelPosition": "aside",
+                            "enabled": false,
+                            "value": "<% flowVariables.email ?: '' %>"
+                        },
+                        {
+                            "type": "text",
+                            "id": "messageValue",
+                            "label": "Message",
+                            "labelPosition": "aside",
+                            "enabled": false,
+                            "value": "<% flowVariables.message ?: '' %>"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

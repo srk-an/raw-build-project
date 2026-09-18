@@ -1,0 +1,23 @@
+{
+    "_comment": "Reference snippet for the AMD's flowDefinitions[] array — this is what wires contactStart's OK button into contactConfirm and carries the flowVariables across. Not a standalone file Studio loads on its own; copy into your app's AMD.",
+    "flowDefinitions": [
+        {
+            "id": "contactFlow",
+            "flowSteps": [
+                {
+                    "id": "contactStartStep",
+                    "taskId": "contactStart",
+                    "startsFlow": true,
+                    "transitions": [
+                        { "order": "a", "value": "contactConfirmStep", "condition": "true" }
+                    ]
+                },
+                {
+                    "id": "contactConfirmStep",
+                    "taskId": "contactConfirm",
+                    "endsFlow": true
+                }
+            ]
+        }
+    ]
+}

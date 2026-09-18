@@ -1,0 +1,58 @@
+{
+    "id": "contactStart",
+    "outboundData": {
+        "outboundEndPoints": [
+            {
+                "type": "outboundVariable",
+                "variableScope": "flow",
+                "name": "contactOutboundVars",
+                "values": [
+                    { "outboundPath": "name", "value": "<% nameInput.value %>" },
+                    { "outboundPath": "email", "value": "<% emailInput.value %>" },
+                    { "outboundPath": "message", "value": "<% messageInput.value %>" }
+                ]
+            }
+        ]
+    },
+    "presentation": {
+        "pageType": "EDIT",
+        "title": {
+            "type": "title",
+            "label": "Contact Card"
+        },
+        "preferredLabelPosition": "aside",
+        "body": {
+            "type": "section",
+            "children": [
+                {
+                    "type": "fieldSet",
+                    "id": "contactSection",
+                    "title": "Your Details",
+                    "children": [
+                        {
+                            "type": "text",
+                            "id": "nameInput",
+                            "label": "Name",
+                            "labelPosition": "aside",
+                            "required": true
+                        },
+                        {
+                            "type": "text",
+                            "id": "emailInput",
+                            "label": "Email",
+                            "labelPosition": "aside",
+                            "required": true
+                        },
+                        {
+                            "type": "text",
+                            "id": "messageInput",
+                            "label": "Message",
+                            "labelPosition": "aside",
+                            "multiline": true
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
