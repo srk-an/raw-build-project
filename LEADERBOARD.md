@@ -1,10 +1,10 @@
 # THE RAW BUILD — Leaderboard
 
-| Rank | Name | Wk1 | Wk2 | Total | Streak |
-|---|---|---|---|---|---|
-| 1 | Abinaya Sivakumar | 70 | 115 | 185 | 🔥1 |
-| 2 | Vignesh Balan | 50 | 125 | 175 | 🔥1 |
-| 3 | Lavanya Suji | 30 | 115 | 145 | 🔥1 |
+| Rank | Name | Wk1 | Wk2 | Wk3 | Total | Streak |
+|---|---|---|---|---|---|---|
+| 1 | Vignesh Balan | 50 | 125 | 150 | 325 | 🔥2 |
+| 2 | Abinaya Sivakumar | 70 | 115 | 130 | 315 | 🔥2 |
+| 3 | Lavanya Suji | 30 | 115 | 100 | 245 | 🔥2 |
 
 ## Notes
 
@@ -27,3 +27,14 @@
   5 time + 10 for rendering names as related-action links in the grid).
 - Streak note: all three reset to 0 after Wk1 (below the 80-pt threshold) and restarted at 🔥1 after
   clearing 80+ in Wk2.
+- Wk3: "Feedback Form" — live outbound-endpoint exception round (see
+  [briefs/week-03-brief.html](briefs/week-03-brief.html)). All three hit the 40/20/25/15 base rubric
+  again (right widget, layout, outbound config, finished/round-trip) — outbound wiring landed as
+  cleanly as the live-read endpoint did in Wk2. Bonus points again awarded on top of the fixed 100-pt
+  scale, this time for a page Title, finishing well inside the clock (Time), and (VB only) a View Page
+  to confirm the saved record — another one-off organizer call, not a standing rubric change.
+- Wk3 scores: VB 150 (100 base + 10 title + 20 time + 20 view page) — biggest bonus haul yet, and
+  retakes the overall lead. AS 130 (100 base + 10 title + 20 time). LS 100 (80 base: widget 30, layout
+  20, outbound 15, finished 15 + 10 title + 10 time) — base score dipped from Wk2 but bonuses kept the
+  total at a full 100 for the week.
+- Streak note: all three cleared 80+ again in Wk3, extending the streak to 🔥2.
