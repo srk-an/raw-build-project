@@ -2,8 +2,8 @@
 
 | Rank | Name | Wk1 | Wk2 | Wk3 | Total | Streak |
 |---|---|---|---|---|---|---|
-| 1 | Vignesh Balan | 50 | 125 | 150 | 325 | 🔥2 |
-| 2 | Abinaya Sivakumar | 70 | 115 | 130 | 315 | 🔥2 |
+| 1 | Abinaya Sivakumar | 70 | 115 | 150 | 335 | 🔥2 |
+| 2 | Vignesh Balan | 50 | 125 | 150 | 325 | 🔥2 |
 | 3 | Lavanya Suji | 30 | 115 | 100 | 245 | 🔥2 |
 
 ## Notes
@@ -31,10 +31,13 @@
   [briefs/week-03-brief.html](briefs/week-03-brief.html)). All three hit the 40/20/25/15 base rubric
   again (right widget, layout, outbound config, finished/round-trip) — outbound wiring landed as
   cleanly as the live-read endpoint did in Wk2. Bonus points again awarded on top of the fixed 100-pt
-  scale, this time for a page Title, finishing well inside the clock (Time), and (VB only) a View Page
-  to confirm the saved record — another one-off organizer call, not a standing rubric change.
-- Wk3 scores: VB 150 (100 base + 10 title + 20 time + 20 view page) — biggest bonus haul yet, and
-  retakes the overall lead. AS 130 (100 base + 10 title + 20 time). LS 100 (80 base: widget 30, layout
-  20, outbound 15, finished 15 + 10 title + 10 time) — base score dipped from Wk2 but bonuses kept the
-  total at a full 100 for the week.
+  scale, this time for a page Title, finishing well inside the clock (Time), and a View Page to confirm
+  the saved record — another one-off organizer call, not a standing rubric change.
+- Wk3 scores: AS 150 (100 base + 10 title + 20 time + 20 view page) and VB 150 (100 base + 10 title +
+  20 time + 20 view page) — a genuine tie for the week, identical breakdown on both sides. AS's higher
+  cumulative total going into the week keeps her on top of the overall standings. LS 100 (80 base:
+  widget 30, layout 20, outbound 15, finished 15 + 10 title + 10 time) — base score dipped from Wk2 but
+  bonuses kept the total at a full 100 for the week.
+- Correction (2026-09-18): AS's Wk3 score was originally recorded as 130, missing the 20-pt View Page
+  bonus she also earned — corrected to 150, which also flips the overall lead from VB back to AS.
 - Streak note: all three cleared 80+ again in Wk3, extending the streak to 🔥2.
