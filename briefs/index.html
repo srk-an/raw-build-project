@@ -156,9 +156,8 @@
 
   .chip.teal { color: var(--teal); background: var(--teal-soft); border-color: transparent; }
 
+  .nav-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .3rem; }
   .error-guide-btn {
-    align-self: flex-start;
-    margin-top: .3rem;
     display: inline-flex;
     align-items: center;
     gap: .5rem;
@@ -396,9 +395,14 @@
       <span class="chip">Workday Extend PMD</span>
       <span class="chip">3 weeks played</span>
     </div>
-    <a class="error-guide-btn" href="error-guide.html">
-      <span>🛠️</span> Check PMD Error Field Guide
-    </a>
+    <div class="nav-row">
+      <a class="error-guide-btn" href="error-guide.html">
+        <span>🛠️</span> Check PMD Error Field Guide
+      </a>
+      <a class="error-guide-btn" href="tools/bow-review.html">
+        <span>🧰</span> BOW Review Auditor
+      </a>
+    </div>
   </div>
 
   <div class="podium">

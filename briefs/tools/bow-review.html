@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE RAW BUILD — BOW Review Auditor</title>
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  :root {
+    --paper: #f2f4f1;
+    --paper-raised: #ffffff;
+    --ink: #1b2430;
+    --ink-soft: #4a5568;
+    --line: rgba(27,36,48,.14);
+    --line-strong: rgba(27,36,48,.28);
+    --accent: #d98a1f;
+    --accent-ink: #7a4a0e;
+    --teal: #257a70;
+    --teal-soft: #e4f1ef;
+    --good: #2f7d4f;
+    --good-soft: #e4f2e8;
+    --bad: #b23b2e;
+    --bad-soft: #f7e6e3;
+    --shadow: 0 1px 2px rgba(27,36,48,.06), 0 8px 24px rgba(27,36,48,.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171b22;
+      --paper-raised: #1f242e;
+      --ink: #eef1f5;
+      --ink-soft: #a3adba;
+      --line: rgba(238,241,245,.14);
+      --line-strong: rgba(238,241,245,.26);
+      --accent: #f2a93b;
+      --accent-ink: #ffd694;
+      --teal: #59b3a6;
+      --teal-soft: #1b2e2c;
+      --good: #5fbf82;
+      --good-soft: #16261c;
+      --bad: #e07862;
+      --bad-soft: #2c1c19;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #171b22;
+    --paper-raised: #1f242e;
+    --ink: #eef1f5;
+    --ink-soft: #a3adba;
+    --line: rgba(238,241,245,.14);
+    --line-strong: rgba(238,241,245,.26);
+    --accent: #f2a93b;
+    --accent-ink: #ffd694;
+    --teal: #59b3a6;
+    --teal-soft: #1b2e2c;
+    --good: #5fbf82;
+    --good-soft: #16261c;
+    --bad: #e07862;
+    --bad-soft: #2c1c19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .page { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.75rem; }
+  .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+  .eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  a { color: var(--teal); }
+  .back-link { font-size: .82rem; font-weight: 600; text-decoration: none; color: var(--teal); align-self: flex-start; }
+  .back-link:hover { text-decoration: underline; }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: var(--shadow); padding: 2rem 2rem 1.75rem; display: flex; flex-direction: column; gap: .9rem;
+  }
+  h1.event-title {
+    font-family: "Arial Black", Arial, sans-serif; font-weight: 900;
+    font-size: clamp(1.8rem, 5vw, 2.8rem); letter-spacing: -0.01em; line-height: .98;
+  }
+  .pitch { font-size: 1.05rem; color: var(--ink-soft); max-width: 66ch; margin: 0; }
+  .rule-strip { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; }
+  .chip {
+    font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: .3rem .6rem; border-radius: 3px; border: 1px solid var(--line-strong); color: var(--ink-soft);
+  }
+  .chip.teal { color: var(--teal); background: var(--teal-soft); border-color: transparent; }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: var(--shadow); padding: 1.5rem 1.6rem; display: flex; flex-direction: column; gap: 1rem;
+  }
+  .card h2 { font-size: 1rem; letter-spacing: .02em; }
+  .note { font-size: .85rem; color: var(--ink-soft); margin: 0; }
+
+  /* ---------- Drop zone ---------- */
+  .drop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .35rem;
+    text-align: center; padding: 2.2rem 1.2rem; border: 2px dashed var(--line-strong); border-radius: 8px;
+    cursor: pointer; background: var(--paper); transition: border-color .15s ease, background-color .15s ease;
+  }
+  .drop:hover, .drop.over, .drop:focus-within { border-color: var(--teal); background: var(--teal-soft); }
+  .drop svg { color: var(--teal); }
+  .drop .big { font-weight: 700; font-size: 1.05rem; }
+  .drop .small { font-size: .82rem; color: var(--ink-soft); }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+  .drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .field { display: flex; flex-direction: column; gap: .3rem; max-width: 360px; }
+  .field label { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+  input[type="text"], input[type="search"] {
+    font: inherit; font-size: .9rem; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--line-strong); border-radius: 4px; padding: .5rem .65rem; width: 100%;
+  }
+  input[type="text"]:focus-visible, input[type="search"]:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .status { margin: 0; font-size: .9rem; min-height: 1.4em; color: var(--ink-soft); }
+  .status.error { color: var(--bad); font-weight: 600; }
+  .status.ok { color: var(--good); font-weight: 600; }
+
+  /* ---------- Buttons ---------- */
+  button {
+    font: inherit; cursor: pointer; border-radius: 4px; border: 1px solid var(--line-strong);
+    background: transparent; color: var(--ink); padding: .5rem .9rem; font-size: .85rem; font-weight: 600;
+    transition: background-color .15s ease, border-color .15s ease;
+  }
+  button:hover { background: var(--line); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #251505; }
+  button.primary:hover { filter: brightness(1.05); background: var(--accent); }
+  .btn-row { display: flex; gap: .6rem; flex-wrap: wrap; }
+
+  /* ---------- Summary tiles ---------- */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr 1fr 1.9fr; gap: 1rem; }
+  @media (max-width: 760px) { .tiles { grid-template-columns: 1fr 1fr; } }
+  .tile { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow); padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+  .tile .label { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+  .tile .value { font-family: "Arial Black", Arial, sans-serif; font-weight: 900; font-size: 2rem; line-height: 1.1; }
+  .tile .value.small { font-family: "SFMono-Regular", Consolas, monospace; font-size: .95rem; font-weight: 700; overflow-wrap: anywhere; padding-top: .55rem; }
+  .tile.action .value { color: var(--bad); }
+  .tile.advice .value { color: var(--teal); }
+
+  /* ---------- Findings table ---------- */
+  .toolbar { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+  .toolbar .grow { flex: 1; min-width: 200px; }
+  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 4px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; padding: .45rem .8rem; font-size: .78rem; }
+  .seg button + button { border-left: 1px solid var(--line-strong); }
+  .seg button[aria-pressed="true"] { background: var(--teal); color: #fff; }
+  .seg button[aria-pressed="true"]:hover { background: var(--teal); }
+  .count { font-size: .8rem; color: var(--ink-soft); }
+
+  .table-wrap { overflow: auto; max-height: 560px; border: 1px solid var(--line); border-radius: 4px; }
+  table.grid { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  table.grid th {
+    position: sticky; top: 0; background: var(--paper); text-align: left; font-size: .66rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); padding: .6rem .7rem;
+    border-bottom: 1px solid var(--line-strong); white-space: nowrap;
+  }
+  table.grid td { padding: .6rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.grid tr:last-child td { border-bottom: 0; }
+  table.grid td.comp { font-weight: 600; min-width: 230px; overflow-wrap: anywhere; }
+  table.grid td.cmt { min-width: 170px; }
+  table.grid td.rec { min-width: 300px; color: var(--ink-soft); }
+  .pill { display: inline-block; font-size: .7rem; font-weight: 700; padding: .12rem .55rem; border-radius: 999px; white-space: nowrap; }
+  .pill.action { background: var(--bad-soft); color: var(--bad); }
+  .pill.advice { background: var(--teal-soft); color: var(--teal); }
+  .pill.pass { background: var(--good-soft); color: var(--good); }
+  .pill.manual { background: var(--line); color: var(--ink-soft); }
+  .more { align-self: flex-start; }
+
+  details > summary { cursor: pointer; font-weight: 700; font-size: 1rem; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: "\25B8"; color: var(--teal); transition: transform .15s ease; }
+  details[open] > summary::before { transform: rotate(90deg); }
+  details > .body { margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+  td.rid { font-family: "SFMono-Regular", Consolas, monospace; font-weight: 700; white-space: nowrap; }
+
+  ol.steps { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: .4rem; font-size: .9rem; color: var(--ink-soft); }
+  ol.steps strong { color: var(--ink); }
+
+  footer { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: .82rem; color: var(--ink-soft); padding-top: .5rem; border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a class="back-link" href="../index.html">&larr; Back to leaderboard</a>
+
+  <header class="masthead">
+    <span class="eyebrow">Tools &middot; Built on Workday</span>
+    <h1 class="event-title">BOW REVIEW AUDITOR</h1>
+    <p class="pitch">Upload your Extend app export and get the Built on Workday review sheet &mdash; Build Checklist, Review Feedback and Summary &mdash; as an Excel file, before Workday's reviewer finds the same things.</p>
+    <div class="rule-strip">
+      <span class="chip teal">Runs in your browser</span>
+      <span class="chip">Your zip is never uploaded</span>
+      <span class="chip">35 rules from the readiness checklist</span>
+    </div>
+  </header>
+
+  <section class="card" aria-labelledby="uploadTitle">
+    <h2 id="uploadTitle">Upload your app export</h2>
+    <ol class="steps">
+      <li>In Studio, <strong>export the latest build</strong> of your app. You get a <span class="mono">.zip</span> named like <span class="mono">resolveiq_zyfpsx.zip</span>.</li>
+      <li>Drop that zip below <strong>without unzipping it</strong>.</li>
+      <li>Review the findings, then <strong>download the Excel sheet</strong> and fill in the Partner Comment column.</li>
+    </ol>
+
+    <label class="drop" id="drop" for="file">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+      <span class="big" id="dropTitle">Drop the app export .zip here</span>
+      <span class="small">or click to choose a file</span>
+      <input id="file" type="file" accept=".zip,application/zip,application/x-zip-compressed">
+    </label>
+
+    <div class="field">
+      <label for="appName">App name on the sheet</label>
+      <input id="appName" type="text" placeholder="Detected from the export" autocomplete="off">
+    </div>
+
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="results" hidden aria-label="Audit results">
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section class="card" id="exportCard" hidden aria-labelledby="exportTitle">
+    <h2 id="exportTitle">Get the sheet</h2>
+    <div class="btn-row">
+      <button type="button" class="primary" id="btnXlsx">Download Excel (.xlsx)</button>
+      <button type="button" id="btnCopy">Copy for Google Sheets</button>
+      <button type="button" id="btnCsv">Download CSV</button>
+    </div>
+    <p class="note">The Excel file has four tabs: the build sheet (Build Checklist + Review Feedback, same columns as Workday's), Comments, Summary (live Action/Advice counters plus a pass/fail line for every rule) and Details (every individual line behind the grouped rows). For Google Sheets, click <em>Copy for Google Sheets</em>, create a blank sheet and paste into cell A1.</p>
+  </section>
+
+  <section class="card" id="findingsCard" hidden aria-labelledby="findingsTitle">
+    <h2 id="findingsTitle">Review Feedback</h2>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Filter by type">
+        <button type="button" data-f="all" aria-pressed="true">All</button>
+        <button type="button" data-f="Action" aria-pressed="false">Action</button>
+        <button type="button" data-f="Advice" aria-pressed="false">Advice</button>
+      </div>
+      <div class="grow"><input id="search" type="search" placeholder="Search component, comment or recommendation" aria-label="Search findings"></div>
+      <span class="count" id="shown"></span>
+    </div>
+    <div class="table-wrap">
+      <table class="grid">
+        <thead><tr><th>Component</th><th>Review Comment</th><th>Type</th><th>Recommended or Required Action</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <button type="button" class="more" id="more" hidden>Show all</button>
+  </section>
+
+  <section class="card" id="rulesCard">
+    <details id="rulesDetails">
+      <summary>What gets checked</summary>
+      <div class="body">
+        <p class="note">Every rule comes from Part B of the BOW App Review Readiness Checklist. After a run, each row shows how your export did. Rules marked <em>Manual check</em> cannot be read from the code (guides, UI video).</p>
+        <div class="table-wrap">
+          <table class="grid">
+            <thead><tr><th>Rule</th><th>Area</th><th>Check</th><th>Result</th></tr></thead>
+            <tbody id="ruleRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <span>Self-audit only. Wording follows Workday's review sheet, but the reviewer and Studio's validation panel have the final say.</span>
+    <span class="mono">BOW Review Auditor</span>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="bow-audit.js"></script>
+<script src="bow-export.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { files: null, zipName: '', result: null, filter: 'all', query: '', showAll: false };
+  var PAGE = 150;
+
+  function setStatus(msg, kind) { var s = $('status'); s.textContent = msg; s.className = 'status' + (kind ? ' ' + kind : ''); }
+
+  /* ---------- reading the zip ---------- */
+  async function readZip(file) {
+    if (typeof JSZip === 'undefined') throw new Error('The zip reader did not load. Check your connection and reload the page.');
+    var zip = await JSZip.loadAsync(file);
+    var out = [], total = 0;
+    var entries = [];
+    zip.forEach(function (path, entry) { if (!entry.dir) entries.push(entry); });
+    if (entries.length > 6000) throw new Error('That zip has ' + entries.length + ' files, which is far more than an app export holds.');
+    for (var i = 0; i < entries.length; i++) {
+      var e = entries[i];
+      var ext = (/\.([A-Za-z0-9]+)$/.exec(e.name) || [])[1];
+      if (!ext || !BowAudit.TEXT_EXT[ext.toLowerCase()]) continue;
+      var text = await e.async('string');
+      if (text.length > 8 * 1024 * 1024) continue;
+      total += text.length;
+      out.push({ path: e.name, text: text });
+    }
+    return out;
+  }
+
+  function clearResults() {
+    var hadFiles = !!state.files;
+    state.files = null; state.result = null; state.zipName = '';
+    ['results', 'exportCard', 'findingsCard'].forEach(function (id) { $(id).hidden = true; });
+    $('dropTitle').textContent = 'Drop the app export .zip here';
+    $('appName').placeholder = 'Detected from the export';
+    renderRules(null);
+    return hadFiles;
+  }
+
+  async function handleFile(file) {
+    if (!file) return;
+    // a new upload replaces everything from the last one, including a name typed for that app
+    if (clearResults()) $('appName').value = '';
+    if (!/\.zip$/i.test(file.name)) { setStatus('That is not a .zip file. Export the app from Studio and upload the zip as it is.', 'error'); return; }
+    if (file.size > 150 * 1024 * 1024) { setStatus('That zip is over 150 MB, which is too large for an app export.', 'error'); return; }
+    setStatus('Reading ' + file.name + '…');
+    try {
+      var files = await readZip(file);
+      state.files = files; state.zipName = file.name;
+      runAudit();
+    } catch (err) {
+      console.error(err);
+      var zipProblem = /central directory|zip file|corrupt|end of/i.test(String(err && err.message));
+      setStatus(zipProblem ? 'That file could not be read as a zip. Export the app again from Studio and upload the .zip exactly as it comes out.' : 'Could not read that file: ' + (err && err.message ? err.message : err), 'error');
+    }
+  }
+
+  function runAudit() {
+    var typed = $('appName').value.trim();
+    var result = BowAudit.runAudit(state.files, { appName: typed || undefined });
+    if (!result.looksLikeExport || !result.fileCount) {
+      var name = state.zipName;
+      clearResults();
+      setStatus("This doesn't look like a Studio app export. I could not find any .pmd pages or an appManifest.json inside " + name + '.', 'error');
+      return;
+    }
+    state.result = result;
+    state.showAll = false;
+    $('appName').placeholder = result.app.name;
+    $('dropTitle').textContent = state.zipName;
+    renderTiles(result); renderRules(result); renderRows();
+    ['results', 'exportCard', 'findingsCard'].forEach(function (id) { $(id).hidden = false; });
+    var msg = 'Audited ' + result.fileCount + ' files in ' + state.zipName + ': ' + result.counts.Action + ' Action and ' + result.counts.Advice + ' Advice findings.';
+    if (result.parseErrors.length) msg += ' ' + result.parseErrors.length + ' file(s) could not be parsed; see the Review Feedback list.';
+    setStatus(msg, 'ok');
+  }
+
+  /* ---------- rendering ---------- */
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+  function renderTiles(r) {
+    var t = $('tiles'); t.textContent = '';
+    [['action', 'Action items', r.counts.Action], ['advice', 'Advice items', r.counts.Advice], ['', 'Files audited', r.fileCount]].forEach(function (x) {
+      var d = el('div', 'tile ' + x[0]); d.appendChild(el('span', 'label', x[1])); d.appendChild(el('span', 'value mono', String(x[2]))); t.appendChild(d);
+    });
+    var d = el('div', 'tile'); d.appendChild(el('span', 'label', 'App Ref ID')); d.appendChild(el('span', 'value small', r.app.referenceId || 'not in the zip')); t.appendChild(d);
+  }
+
+  function filtered() {
+    var q = state.query.toLowerCase();
+    return state.result.findings.filter(function (f) {
+      if (state.filter !== 'all' && f.type !== state.filter) return false;
+      return !q || (f.component + ' ' + f.comment + ' ' + f.recommended).toLowerCase().indexOf(q) > -1;
+    });
+  }
+
+  function renderRows() {
+    var list = filtered(), body = $('rows');
+    body.textContent = '';
+    var shown = state.showAll ? list : list.slice(0, PAGE);
+    shown.forEach(function (f) {
+      var tr = document.createElement('tr');
+      tr.appendChild(el('td', 'comp', f.component));
+      tr.appendChild(el('td', 'cmt', f.comment));
+      var td = el('td'); td.appendChild(el('span', 'pill ' + f.type.toLowerCase(), f.type)); tr.appendChild(td);
+      tr.appendChild(el('td', 'rec', f.recommended));
+      body.appendChild(tr);
+    });
+    if (!list.length) { var tr = document.createElement('tr'); var c = el('td', null, 'No findings match.'); c.colSpan = 4; tr.appendChild(c); body.appendChild(tr); }
+    $('shown').textContent = 'Showing ' + shown.length + ' of ' + list.length;
+    var more = $('more');
+    more.hidden = state.showAll || list.length <= PAGE;
+    more.textContent = 'Show all ' + list.length;
+  }
+
+  function renderRules(result) {
+    var body = $('ruleRows'); body.textContent = '';
+    BowAudit.RULES.forEach(function (rule) {
+      if (rule.internal) return;
+      var tr = document.createElement('tr');
+      tr.appendChild(el('td', 'rid', rule.id));
+      tr.appendChild(el('td', null, rule.area));
+      tr.appendChild(el('td', null, rule.title));
+      var td = el('td');
+      if (result) {
+        var res = BowExport.ruleResult(result, rule);
+        var cls = res === 'Pass' ? 'pass' : res === 'Manual check' ? 'manual' : 'action';
+        td.appendChild(el('span', 'pill ' + cls, res));
+      } else td.appendChild(el('span', 'pill ' + (rule.manual ? 'manual' : 'advice'), rule.manual ? 'Manual check' : 'Automated'));
+      tr.appendChild(td);
+      body.appendChild(tr);
+    });
+    if (result && !$('rulesDetails').open && result.parseErrors.length) $('rulesDetails').open = true;
+  }
+
+  /* ---------- downloads ---------- */
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+  }
+
+  async function exportXlsx() {
+    if (!state.result) return;
+    if (typeof ExcelJS === 'undefined') { setStatus('The Excel writer did not load. Use "Download CSV" instead, or check your connection and reload.', 'error'); return; }
+    try {
+      var wb = BowExport.buildWorkbook(ExcelJS, state.result, {});
+      var buf = await wb.xlsx.writeBuffer();
+      download(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), BowExport.fileStem(state.result) + '.xlsx');
+      setStatus('Downloaded ' + BowExport.fileStem(state.result) + '.xlsx', 'ok');
+    } catch (err) { console.error(err); setStatus('Could not build the Excel file: ' + err.message, 'error'); }
+  }
+
+  function exportCsv() {
+    if (!state.result) return;
+    var csv = BowExport.toCSV(BowExport.toRows(state.result));
+    download(new Blob([csv], { type: 'text/csv;charset=utf-8' }), BowExport.fileStem(state.result) + '.csv');
+    setStatus('Downloaded ' + BowExport.fileStem(state.result) + '.csv', 'ok');
+  }
+
+  async function copyForSheets() {
+    if (!state.result) return;
+    var rows = BowExport.toRows(state.result), text = BowExport.toTSV(rows);
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus('Copied ' + rows.length + ' rows. Open a blank Google Sheet, click cell A1 and paste.', 'ok');
+    } catch (e) {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e2) {}
+      ta.remove();
+      setStatus(ok ? 'Copied ' + rows.length + ' rows. Open a blank Google Sheet, click cell A1 and paste.' : 'The browser blocked copying. Use Download Excel or CSV instead.', ok ? 'ok' : 'error');
+    }
+  }
+
+  /* ---------- wiring ---------- */
+  $('file').addEventListener('change', function (e) { handleFile(e.target.files[0]); });
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { handleFile(e.dataTransfer.files[0]); });
+  document.addEventListener('dragover', function (e) { e.preventDefault(); });
+  document.addEventListener('drop', function (e) { e.preventDefault(); });
+
+  var nameTimer;
+  $('appName').addEventListener('input', function () { clearTimeout(nameTimer); nameTimer = setTimeout(function () { if (state.files) runAudit(); }, 350); });
+  $('search').addEventListener('input', function (e) { state.query = e.target.value.trim(); state.showAll = false; if (state.result) renderRows(); });
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      state.filter = b.dataset.f; state.showAll = false;
+      document.querySelectorAll('.seg button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      if (state.result) renderRows();
+    });
+  });
+  $('more').addEventListener('click', function () { state.showAll = true; renderRows(); });
+  $('btnXlsx').addEventListener('click', exportXlsx);
+  $('btnCsv').addEventListener('click', exportCsv);
+  $('btnCopy').addEventListener('click', copyForSheets);
+
+  renderRules(null);
+  window.BowReviewUI = { handleFile: handleFile };
+})();
+</script>
+</body>
+</html>

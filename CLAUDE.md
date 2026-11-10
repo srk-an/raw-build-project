@@ -124,12 +124,23 @@ A markdown table, most recent week as the rightmost column, ranked by cumulative
 /tasks/
   week-01-team-member-card.pmd
   week-02-<slug>.pmd
-/briefs/
+/briefs/                      (this folder is the deployed site root)
   _template.html
   week-01-brief.html
   week-02-brief.html
-  leaderboard.html
+  index.html                  (the leaderboard; was leaderboard.html)
+  error-guide.html            (searchable PMD error catalogue)
+  pages/week-NN.html          (per-week round overview, linked from index.html)
+  tools/
+    bow-review.html           (BOW Review Auditor: upload an Extend export zip, get the review sheet as .xlsx)
+    bow-audit.js              (rule engine, pure JS, also runs in Node)
+    bow-export.js             (xlsx / csv / Google-Sheets-paste output)
 ```
+
+The BOW Review Auditor runs entirely client-side (JSZip + ExcelJS from cdnjs). Its rules come from Part B of
+the BOW App Review Readiness Checklist; to add or change a rule, edit `bow-audit.js` (and `RULES` for the
+Summary tab). It was validated against `resolveiq_zyfpsx.zip` and the real Workday reviewer rows for it
+(36 Action matches the reviewer's count).
 
 ## Enforcing "no AI"
 
