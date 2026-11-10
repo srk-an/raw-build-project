@@ -430,6 +430,43 @@
     });
 
     /* ===================== ENDPOINTS ===================== */
+    // Which instanceList (if any) does this endpoint fill? Follows helper functions that wrap the endpoint.
+    function fnBodies(text) {
+      var re = /\bvar\s+([A-Za-z_]\w*)\s*=\s*function\b/g, m, marks = [];
+      while ((m = re.exec(text))) marks.push({ name: m[1], at: m.index });
+      return marks.map(function (mk, i) { return { name: mk.name, body: text.slice(mk.at, i + 1 < marks.length ? marks[i + 1].at : text.length) }; });
+    }
+    function instanceListFedBy(p, endpointName) {
+      var scriptText = (typeof p.json.script === 'string' ? p.json.script : '') + '\n' + p.includes.map(function (s) { return s.text; }).join('\n');
+      var bodies = fnBodies(scriptText), feeders = {}, changed = true, guard = 0;
+      feeders[endpointName] = 1;
+      while (changed && guard++ < 4) {
+        changed = false;
+        bodies.forEach(function (b) {
+          if (!feeders[b.name] && Object.keys(feeders).some(function (k) { return countWord(b.body, k) > 0; })) { feeders[b.name] = 1; changed = true; }
+        });
+      }
+      var names = Object.keys(feeders), hit = '';
+      walk(p.json.presentation, function (o) {
+        if (hit || Array.isArray(o) || o.type !== 'instanceList') return;
+        var s = JSON.stringify(o);
+        if (names.some(function (n) { return countWord(s, n) > 0; })) hit = o.id || 'instanceList';
+      });
+      return hit;
+    }
+    function largeEndpoint(p, e, what) {
+      var il = instanceListFedBy(p, e.name);
+      if (il) {
+        add({ rule: 'E6', component: baseName(p.path), comment: 'Large endpoint', type: 'Action',
+          recommended: 'Endpoint ' + e.name + ' loads ' + what + ' up front to fill the instanceList "' + il + '". The limit may truncate your data set and this is a poorly performing pattern. Recommend using a search endpoint instead (searchEndPoint driven by instanceListQuery, so the list is filled from what the user types).',
+          details: [det(p.path, e.__line || 1)] });
+      } else {
+        add({ rule: 'E6', component: baseName(p.path), comment: 'Large endpoint', type: 'Advice',
+          recommended: 'Endpoint ' + e.name + ' is a big call: it reads ' + what + ' with no WHERE condition, and the limit may truncate your data set. That can be fine if the page genuinely needs the full set, but look for an alternative where you can: filter in the query (WHERE), page the results, or select only the fields the page uses.',
+          details: [det(p.path, e.__line || 1)] });
+      }
+    }
+
     var providers = (amd && Array.isArray(amd.dataProviders)) ? amd.dataProviders : [];
     var hostRe = /https?:\/\/[^\s"'<>)]+/;
     providers.forEach(function (p) {
@@ -474,19 +511,15 @@
         var q = (e.wqlQuery && e.wqlQuery.query) || '';
         if (!q && /query=/i.test(String(e.url || ''))) q = String(e.url);
         if (e.baseUrlType === 'workday-wql' || /wql/i.test(String(e.baseUrlType))) {
-          if (/\bFROM\s+(all[A-Za-z]*|workers[A-Za-z]*)\b/i.test(q) && !/\bWHERE\b/i.test(q)) {
-            add({ rule: 'E6', component: pageName, comment: 'Large endpoint', type: 'Action',
-              recommended: 'Endpoint ' + e.name + ' is going to be a big call, but it will also have a limit that may truncate your data set. This will be a poorly performing pattern. Recommend using a search endpoint instead',
-              details: [det(p.path, e.__line || 1)] });
-          }
+          var fromDs = /\bFROM\s+(all[A-Za-z]*|workers[A-Za-z]*)\b/i.exec(q);
+          if (fromDs && !/\bWHERE\b/i.test(q)) largeEndpoint(p, e, 'every record from ' + fromDs[1]);
           if (/data\?query=[^"]*%(20|27|2C|3D|22)/i.test(String(e.url || ''))) {
             add({ rule: 'E9', component: pageName + ' - Endpoint: ' + e.name, comment: 'WQL appears to be pre-encoded', type: 'Advice',
               recommended: 'Write WQL as readable text and encode it once with urlEncode() when the url is built.', details: [det(p.path, e.__line || 1)] });
           }
         }
         if (/^\/?workers\/?(\?|$)/.test(String(e.url || '')) && !/search=|filter|query/i.test(String(e.url))) {
-          add({ rule: 'E6', component: pageName, comment: 'Large endpoint', type: 'Action',
-            recommended: 'Endpoint ' + e.name + ' loads workers up front and the limit will cut data off. Use a search endpoint driven by what the user types.', details: [det(p.path, e.__line || 1)] });
+          largeEndpoint(p, e, 'all workers');
         }
       });
     });
